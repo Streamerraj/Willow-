@@ -1,4 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+
+<title>TG_@Cricmatchstream</title>
+
+<script src="https://cdn.jsdelivr.net/npm/shaka-player@5.1.10/dist/shaka-player.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shaka-player@5.1.10/dist/controls.min.css">
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:#000;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+.shaka-video-container{
+    width:100%;
+    height:100%;
+    background:#000;
+}
+
+#videoPlayer{
+    width:100%;
+    height:100%;
+    background:#000;
+    object-fit:contain;
+}
+
+/* Telegram popup */
+.telegram-overlay{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.82);
+}
+
+.telegram-overlay.show{
+    display:flex;
+}
+
+.telegram-box{
+    width:100%;
+    max-width:350px;
+    padding:28px 22px;
+    text-align:center;
+    color:#fff;
+    background:#151515;
+    border:1px solid #333;
+    border-radius:18px;
+    box-shadow:0 15px 45px rgba(0,0,0,.6);
+    animation:popupIn .3s ease;
+}
+
+@keyframes popupIn{
+    from{opacity:0;transform:translateY(15px)}
+    to{opacity:1;transform:translateY(0)}
+}
+
+.telegram-icon{
+    width:60px;
+    height:60px;
+    margin:0 auto 15px;
+    border-radius:50%;
+    background:#229ED9;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.telegram-box h2{
+    margin:0 0 12px;
+    font-size:22px;
+}
+
+.telegram-box p{
+    margin:0 0 22px;
+    color:#bbb;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.telegram-join{
+    display:block;
+    width:100%;
+    padding:13px;
+    margin-bottom:12px;
+    border:0;
+    border-radius:9px;
+    background:#229ED9;
+    color:#fff;
+    font-size:15px;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.telegram-close{
+    width:100%;
+    padding:12px;
+    border:1px solid #444;
+    border-radius:9px;
+    background:#252525;
+    color:#ddd;
+    font-size:14px;
+    cursor:pointer;
+}
+
+@media(max-width:600px){
+    .telegram-box{max-width:330px;padding:25px 20px}
+}
+</style>
+</head>
+
+<body>
+
+<div id="videoContainer" class="shaka-video-container">
+    <video id="videoPlayer" playsinline autoplay muted></video>
+</div>
+
+<!-- Telegram popup -->
+<div class="telegram-overlay" id="telegramPopup">
+    <div class="telegram-box">
+        <div class="telegram-icon">➤</div>
+        <h2>Join Our Telegram</h2>
+        <p>
+            Join <strong>@cricmatchstream</strong>
+            for updates and more links.
+        </p>
+
+        <a class="telegram-join"
+           href="https://t.me/cricmatchstream"
+           target="_blank"
+           rel="noopener noreferrer">
+            JOIN TELEGRAM
+        </a>
+
+        <button class="telegram-close" id="closePopup">
+            Already Joined / Close
+        </button>
+    </div>
+</div>
+
 <script>
-<!-- code by https://www.html-code-generator.com -->
-document.write(unescape('%3C%21DOCTYPE%20html%3E%0A%3Chtml%20lang%3D%22en%22%3E%0A%3Chead%3E%0A%3Cmeta%20charset%3D%22UTF-8%22%3E%0A%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice-width%2Cinitial-scale%3D1%22%3E%0A%3Cmeta%20name%3D%22referrer%22%20content%3D%22no-referrer%22%3E%0A%3Cmeta%20http-equiv%3D%22Cache-Control%22%20content%3D%22no-store%2C%20no-cache%2C%20must-revalidate%22%3E%0A%3Cmeta%20http-equiv%3D%22Pragma%22%20content%3D%22no-cache%22%3E%0A%3Cmeta%20http-equiv%3D%22Expires%22%20content%3D%220%22%3E%0A%0A%3Ctitle%3E@CRICMATCHSTREAM%3C/title%3E%0A%0A%3Clink%20href%3D%22https%3A//cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css%22%20rel%3D%22stylesheet%22%3E%0A%0A%3Cstyle%3E%0A*%20%7B%0A%20%20%20%20box-sizing%3A%20border-box%3B%0A%7D%0A%0Ahtml%2C%20body%20%7B%0A%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20height%3A%20100%25%3B%0A%20%20%20%20margin%3A%200%3B%0A%20%20%20%20padding%3A%200%3B%0A%20%20%20%20overflow%3A%20hidden%3B%0A%20%20%20%20background%3A%20%23050505%3B%0A%7D%0A%0Abody%20%7B%0A%20%20%20%20position%3A%20relative%3B%0A%7D%0A%0A/*%20TOP%20LEFT%20CLICKABLE%20POSTER%20*/%0A.banner-container%20%7B%0A%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20top%3A%2012px%3B%0A%20%20%20%20left%3A%2012px%3B%0A%20%20%20%20width%3A%20220px%3B%0A%20%20%20%20z-index%3A%201000%3B%0A%7D%0A%0A.banner-container%20a%20%7B%0A%20%20%20%20display%3A%20block%3B%0A%7D%0A%0A.banner-container%20img%20%7B%0A%20%20%20%20display%3A%20block%3B%0A%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20height%3A%20auto%3B%0A%20%20%20%20border-radius%3A%208px%3B%0A%7D%0A%0A/*%20VIDEO%20PLAYER%20*/%0A.video-container%20%7B%0A%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20top%3A%200%3B%0A%20%20%20%20left%3A%200%3B%0A%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20height%3A%20100%25%3B%0A%20%20%20%20overflow%3A%20hidden%3B%0A%20%20%20%20background%3A%20%23000%3B%0A%7D%0A%0A%23video%20%7B%0A%20%20%20%20position%3A%20absolute%3B%0A%20%20%20%20top%3A%200%3B%0A%20%20%20%20left%3A%200%3B%0A%20%20%20%20width%3A%20100%25%3B%0A%20%20%20%20height%3A%20100%25%3B%0A%20%20%20%20object-fit%3A%20contain%3B%0A%7D%0A%0A/*%20MOBILE%20*/%0A@media%20%28max-width%3A%20767px%29%20%7B%0A%20%20%20%20.banner-container%20%7B%0A%20%20%20%20%20%20%20%20top%3A%208px%3B%0A%20%20%20%20%20%20%20%20left%3A%208px%3B%0A%20%20%20%20%20%20%20%20width%3A%20130px%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20.shaka-overlay%20.shaka-controls%20%7B%0A%20%20%20%20%20%20%20%20padding%3A%205px%3B%0A%20%20%20%20%7D%0A%0A%20%20%20%20.shaka-overlay%20.shaka-controls%20.shaka-control-button.shaka-button-overflow-menu%20%7B%0A%20%20%20%20%20%20%20%20transform%3A%20scale%280.7%29%3B%0A%20%20%20%20%7D%0A%7D%0A%0A/*%20SHAKA%20PLAYER%20COLORS%20*/%0A.shaka-overflow-menu%2C%0A.shaka-settings-menu%20%7B%0A%20%20%20%20background-color%3A%20rgba%28255%2C%200%2C%20120%2C%200.9%29%3B%0A%7D%0A%0A.shaka-current-selection-span%2C%0A.shaka-settings-menu%20button%20%7B%0A%20%20%20%20color%3A%20%230fc%3B%0A%20%20%20%20font-weight%3A%20700%3B%0A%7D%0A%0A.shaka-overflow-menu%20button%3Ahover%2C%0A.shaka-settings-menu%20button%3Ahover%20%7B%0A%20%20%20%20background-color%3A%20%23000%3B%0A%7D%0A%0A.shaka-overflow-button-label%20%7B%0A%20%20%20%20color%3A%20%23ffffe6%3B%0A%20%20%20%20font-weight%3A%20700%3B%0A%7D%0A%0A.material-icons-round%20%7B%0A%20%20%20%20color%3A%20%23e6e6e6%3B%0A%7D%0A%0A.shaka-spinner-container%20%7B%0A%20%20%20%20display%3A%20none%20%21important%3B%0A%7D%0A%3C/style%3E%0A%0A%3Cscript%0Asrc%3D%22https%3A//cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js%22%0Acrossorigin%3D%22anonymous%22%0Adefer%3E%0A%3C/script%3E%0A%0A%3C/head%3E%0A%0A%3Cbody%3E%0A%0A%3C%21--%20VIDEO%20PLAYER%20--%3E%0A%3Cdiv%20class%3D%22video-container%22%20data-shaka-player-container%3E%0A%20%20%20%20%3Cvideo%0A%20%20%20%20%20%20%20%20autoplay%0A%20%20%20%20%20%20%20%20data-shaka-player%0A%20%20%20%20%20%20%20%20id%3D%22video%22%0A%20%20%20%20%20%20%20%20muted%0A%20%20%20%20%20%20%20%20poster%3D%22https%3A//mgpindia.com/wp-content/uploads/2021/10/willow-logo.jpg%22%0A%20%20%20%20%20%20%20%20preload%3D%22auto%22%3E%0A%20%20%20%20%3C/video%3E%0A%3C/div%3E%0A%0A%3C%21--%20CLICKABLE%20TOP%20LEFT%20POSTER%20--%3E%0A%3Cdiv%20class%3D%22banner-container%22%3E%0A%20%20%20%20%3Ca%0A%20%20%20%20%20%20%20%20href%3D%22https%3A//Balaji99.life%22%0A%20%20%20%20%20%20%20%20target%3D%22_blank%22%0A%20%20%20%20%20%20%20%20rel%3D%22noopener%20noreferrer%22%3E%0A%0A%20%20%20%20%20%20%20%20%3Cimg%0A%20%20%20%20%20%20%20%20%20%20%20%20src%3D%22https%3A//plain-apac-prod-public.komododecks.com/202610/31/WXhAARE4cAsOGVAH47VW/image.jpg%22%0A%20%20%20%20%20%20%20%20%20%20%20%20alt%3D%22BALAJI%20Poster%22%3E%0A%20%20%20%20%3C/a%3E%0A%3C/div%3E%0A%0A%3Cscript%3E%0Alet%20player%2C%20ui%3B%0A%0Aasync%20function%20init%28%29%20%7B%0A%20%20%20%20const%20video%20%3D%20document.getElementById%28%22video%22%29%3B%0A%0A%20%20%20%20ui%20%3D%20video.ui%3B%0A%0A%20%20%20%20const%20controls%20%3D%20ui.getControls%28%29%3B%0A%20%20%20%20player%20%3D%20controls.getPlayer%28%29%3B%0A%0A%20%20%20%20window.player%20%3D%20player%3B%0A%20%20%20%20window.ui%20%3D%20ui%3B%0A%0A%20%20%20%20ui.configure%28%7B%0A%20%20%20%20%20%20%20%20controlPanelElements%3A%20%5B%0A%20%20%20%20%20%20%20%20%20%20%20%20%22play_pause%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22mute%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22volume%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22spacer%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22time_and_duration%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22picture_in_picture%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22fullscreen%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%22overflow_menu%22%0A%20%20%20%20%20%20%20%20%5D%2C%0A%0A%20%20%20%20%20%20%20%20volumeBarColors%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20base%3A%20%22rgba%28255%2C%200%2C%20150%2C%200.7%29%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20level%3A%20%22rgba%280%2C%20204%2C%20255%2C%200.7%29%22%0A%20%20%20%20%20%20%20%20%7D%2C%0A%0A%20%20%20%20%20%20%20%20seekBarColors%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20base%3A%20%22rgba%280%2C%20204%2C%20255%2C%200.7%29%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20buffered%3A%20%22rgba%28255%2C%200%2C%20150%2C%200.7%29%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20played%3A%20%22rgba%280%2C%20204%2C%20255%2C%200.7%29%22%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%29%3B%0A%0A%20%20%20%20player.configure%28%7B%0A%20%20%20%20%20%20%20%20drm%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20clearKeys%3A%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22a323fd2c6886dfea4831314fd63c4eb7%22%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22462c6dd2b56c26e958f5981fea25aef4%22%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%29%3B%0A%0A%20%20%20%20player.addEventListener%28%22error%22%2C%20onPlayerErrorEvent%29%3B%0A%20%20%20%20controls.addEventListener%28%22error%22%2C%20onUIErrorEvent%29%3B%0A%0A%20%20%20%20try%20%7B%0A%20%20%20%20%20%20%20%20await%20player.load%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%22https%3A//otte.live.fly.ww.aiv-cdn.net/iad-nitro/live/clients/dash/enc/kauhtkxesb/out/v1/b7ddf44fd9d847f892422ff925f1c04c/cenc.mpd%22%0A%20%20%20%20%20%20%20%20%29%3B%0A%20%20%20%20%7D%20catch%20%28error%29%20%7B%0A%20%20%20%20%20%20%20%20onPlayerError%28error%29%3B%0A%20%20%20%20%7D%0A%7D%0A%0Afunction%20onPlayerErrorEvent%28event%29%20%7B%0A%20%20%20%20onPlayerError%28event.detail%29%3B%0A%7D%0A%0Afunction%20onPlayerError%28error%29%20%7B%0A%20%20%20%20console.error%28%22Player%20error%3A%22%2C%20error%29%3B%0A%7D%0A%0Afunction%20onUIErrorEvent%28event%29%20%7B%0A%20%20%20%20onPlayerError%28event.detail%29%3B%0A%7D%0A%0Adocument.addEventListener%28%22shaka-ui-loaded%22%2C%20init%29%3B%0A%0Adocument.addEventListener%28%22shaka-ui-load-failed%22%2C%20%28%29%20%3D%3E%20%7B%0A%20%20%20%20console.error%28%22Shaka%20UI%20failed%20to%20load%22%29%3B%0A%7D%29%3B%0A%0A/*%20TELEGRAM%20POPUP%20*/%0Aconst%20message%20%3D%0A%22JOIN%20OUR%20TELEGRAM%20CHANNEL%20FOR%20MORE%20LIVE%20STREAM%20LINKS%22%3B%0A%0Aif%20%28confirm%28message%29%29%20%7B%0A%20%20%20%20window.location.href%20%3D%20%22https%3A//t.me/cricmatchstream%22%3B%0A%7D%0A%3C/script%3E%0A%0A%3C/body%3E%0A%3C/html%3E'));
+"use strict";
+
+const STREAM_URL =
+    "https://jiotvmblive.cdn.jio.com/bpk-tv/Ten_1_MOB/WDVLive/index.mpd";
+
+const DRM_KEYS =
+    "3394be91407c5fe99d784d2f2d6d4a12:58665e1df41f9f22ed73c56384bb3f51";
+
+const COOKIE_JSON_URL =
+    "https://sonujson-v4.pages.dev/Data/sports.json";
+
+const CHANNEL_ID = "STEN1";
+
+const videoElement = document.getElementById("videoPlayer");
+const videoContainer = document.getElementById("videoContainer");
+
+let player;
+let ui;
+
+/* Telegram popup */
+document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("telegramPopup");
+    const closeButton = document.getElementById("closePopup");
+
+    setTimeout(() => {
+        popup.classList.add("show");
+    }, 1200);
+
+    closeButton.addEventListener("click", () => {
+        popup.classList.remove("show");
+    });
+});
+
+/* Parse DRM key pairs */
+function parseDrmKeys(value) {
+    const clearKeys = {};
+
+    String(value || "")
+        .split(",")
+        .map(pair => pair.trim())
+        .filter(Boolean)
+        .forEach(pair => {
+            const separator = pair.indexOf(":");
+
+            if (separator === -1) return;
+
+            const kid = pair.slice(0, separator).trim().toLowerCase();
+            const key = pair.slice(separator + 1).trim().toLowerCase();
+
+            if (kid && key) {
+                clearKeys[kid] = key;
+            }
+        });
+
+    return clearKeys;
+}
+
+/* Retrieve channel cookie */
+async function getCookie() {
+    const response = await fetch(COOKIE_JSON_URL, {
+        method: "GET",
+        cache: "no-store"
+    });
+
+    if (!response.ok) {
+        throw new Error("Cookie JSON request failed: " + response.status);
+    }
+
+    const data = await response.json();
+
+    if (!data || !Array.isArray(data.channels)) {
+        throw new Error("Invalid JSON format.");
+    }
+
+    const channel = data.channels.find(item =>
+        String(item.id || "").trim().toLowerCase() ===
+        CHANNEL_ID.toLowerCase()
+    );
+
+    if (!channel || !channel.cookie) {
+        throw new Error("Channel cookie not found: " + CHANNEL_ID);
+    }
+
+    return String(channel.cookie).trim();
+}
+
+/* Configure stream requests */
+function configureStreamRequests(cookie) {
+    if (!cookie) return;
+
+    const networkingEngine = player.getNetworkingEngine();
+    if (!networkingEngine) return;
+
+    networkingEngine.registerRequestFilter((type, request) => {
+        if (!request.uris || !request.uris[0]) return;
+
+        request.headers = request.headers || {};
+        request.headers["Cookie"] = cookie;
+
+        const url = request.uris[0];
+
+        if (
+            (type === 0 || type === 1) &&
+            !url.includes("__hdnea=") &&
+            !url.includes("__hdnea__") &&
+            !url.includes("hdnts=")
+        ) {
+            request.uris[0] =
+                url +
+                (url.includes("?") ? "&" : "?") +
+                cookie;
+        }
+    });
+}
+
+/* Configure player */
+function configureDrm() {
+    player.configure({
+        drm: {
+            clearKeys: parseDrmKeys(DRM_KEYS)
+        },
+        manifest: {
+            defaultPresentationDelay: 5
+        },
+        streaming: {
+            lowLatencyMode: true,
+            bufferingGoal: 10,
+            rebufferingGoal: 2,
+            safeSeekOffset: 5
+        }
+    });
+}
+
+/* Initialize Shaka Player */
+async function initPlayer() {
+    try {
+        shaka.polyfill.installAll();
+
+        if (!shaka.Player.isBrowserSupported()) {
+            throw new Error("This browser does not support Shaka Player.");
+        }
+
+        player = new shaka.Player();
+        await player.attach(videoElement);
+
+        ui = new shaka.ui.Overlay(
+            player,
+            videoContainer,
+            videoElement
+        );
+
+        ui.configure({
+            controlPanelElements: [
+                "play_pause",
+                "time_and_duration",
+                "mute",
+                "volume",
+                "spacer",
+                "quality",
+                "picture_in_picture",
+                "fullscreen"
+            ]
+        });
+
+        player.addEventListener("error", event => {
+            console.error("Shaka Player Error:", event.detail);
+        });
+
+        const cookie = await getCookie();
+        configureStreamRequests(cookie);
+        configureDrm();
+
+        await player.load(STREAM_URL);
+
+        try {
+            await videoElement.play();
+        } catch (error) {
+            console.log("Autoplay blocked; press Play to start.");
+        }
+
+    } catch (error) {
+        console.error("Player initialization failed:", error);
+    }
+}
+
+initPlayer();
+
+window.addEventListener("beforeunload", () => {
+    if (player) {
+        player.destroy().catch(() => {});
+    }
+})
+window.addEventListener("load", function () {
+    setTimeout(function () {
+        if (confirm("JOIN OUR TELEGRAM CHANNEL FOR MORE LIVE STREAM LINKS")) {
+            window.location.href = "https://t.me/cricmatchstream";
+        }
+    }, 1000);
+});
 </script>
+
+</body>
+</html>
